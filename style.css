@@ -1,0 +1,9 @@
+input[type=submit]{
+    margin-left: 50%;
+}
+
+.middle{
+    width: 200px;
+    border-bottom: 2px solid red;
+
+}
