@@ -7,17 +7,28 @@
      header('Location:viewDetailed.php');
      exit();
  }
-$data = [
-    'student_id' =>$student_id,
-    'date' =>$date
-];
- $result = $database->selectData('attendance_tbl','*',$data);
 
+$student_id = $_GET['student_id'];
+$date = $_GET['date'];
+ $result = $database->upgradeView('attendance_tbl',$student_id,$date);
 $result->execute();
-$rows = $result->rowCount();
-var_dump($rows);
-die();
 
+$datas =  $result->fetchAll(PDO::FETCH_ASSOC);
+
+if (isset($_POST['upgrade'])){
+    $attendance = $_POST['atten'];
+    foreach ($attendance as $key => $value){
+        $upgrade_attendance = $database->upgradeAttendance('attendance_tbl',$value,$student_id,$date);
+    }
+
+
+   if($upgrade_attendance->execute()){
+       header('Location:viewAttendance.php');
+       exit();
+   }else{
+       echo 'Fuck off';
+   }
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -39,26 +50,47 @@ die();
                       </div>
                 </div>
                 <div class="card-body">
-                    <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+                    <form action="upgrade.php?student_id=<?php echo $student_id.'&&date='.$date?>" method="post">
                          <table class="table table-striped">
                              <thead>
-                             <th width="30%">#</th>
-                               <th width="30%">Student id</th>
-                                <th width="30%">Attendance</th>
+                             <th width="25%">#</th>
+                             <td width="25%">Date</td>
+                               <th width="25%">Student id</th>
+                                <th width="25%">Attendance</th>
                              </thead>
                              <tbody>
-                                 <tr>
-                                    <td></td>
-                                     <td></td>
-                                     <td>
-
-                                         <input type="radio"  name="upgrade[<?php ?>]">present
-                                         <input type="radio"  name="upgrade[<?php ?>]">absent
-                                     </td>
-                                 </tr>
+                                  <tr>
+                                      <?php
+                                         foreach ($datas as $data){
+                                             ?>
+                                             <td><?php echo $data['id'];?></td>
+                                             <td><?php echo $data['date']; ?></td>
+                                             <td><?php echo $data['student_id']; ?></td>
+                                             <?php
+                                             if ($data['attendance'] == 'p'){
+                                                 ?>
+                                                 <td>
+                                                     <input type="radio" name="atten[<?php echo $data['student_id']?>]" value="p" checked>Present
+                                                     <input type="radio" name="atten[<?php echo $data['student_id']?>]" value="a">Absent
+                                                 </td>
+                                                 <?php
+                                             }else{
+                                                 ?>
+                                                 <td>
+                                                     <input type="radio" name="atten[<?php echo $data['student_id']?>]" value="p">present
+                                                     <input type="radio" name="atten[<?php echo $data['student_id']?>]" value="a" checked>absent
+                                                 </td>
+                                                 <?php
+                                             }
+                                             ?>
+                                      <?php
+                                         }
+                                      ?>
+                                  </tr>
                              </tbody>
                          </table>
-                        <input type="submit" name="upgrade" value="Upgrade Attendance" class="btn btn-primary">
+                        <a href="viewAttendance.php"  class="btn btn-primary">Back</a>
+                        <input type="submit" style="float: right" name="upgrade" value="Upgrade Attendance" class="btn btn-info">
                     </form>
                 </div>
             </div>

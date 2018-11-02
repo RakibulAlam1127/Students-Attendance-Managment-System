@@ -104,6 +104,37 @@
 
       }
 
+      /**
+       * @param $table
+       * @param $student_id
+       * @param $date
+       */
+      public function upgradeView($table, $student_id, $date)
+      {
+          $query = 'SELECT * FROM '.$table.' WHERE student_id = :student_id AND date = :date';
+          $this->stmt = $this->connection->prepare($query);
+          $this->stmt->bindValue(':student_id',$student_id);
+          $this->stmt->bindValue(':date',$date);
+          return $this->stmt;
+      }
+
+      /**
+       * @param $table
+       * @param $attendance
+       * @param $student_id
+       * @param $date
+       * @return bool|PDOStatement
+       */
+      public function upgradeAttendance($table, $attendance, $student_id, $date)
+      {
+
+          $sql = 'UPDATE '.$table.' SET attendance = :attendance WHERE student_id ='.$student_id.' AND date = '.$date;
+          $this->stmt =$this->connection->prepare($sql);
+          $this->stmt->bindParam(':attendance',$attendance);
+          return $this->stmt;
+
+      }
+
 
 
 
@@ -114,9 +145,6 @@
   define('PASSWORD_DB','');
 
   $database = new Database(DSN,USER_DB,PASSWORD_DB);
-  //$currentData = date('Y-m-d');
-//  $database->insertData('attendance_tbl',[
-//      'date' => $currentData,
-//      'attendance' => 'present',
-//       'student_id' => '161-15-864'
-//  ]);
+//  $currentDate = date('Y-m-d');
+//  $student_id = '161-15-864';
+//  $database->upgradeAttendance('attendance_tbl','p','161-154-867',$currentDate);
