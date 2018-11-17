@@ -125,15 +125,25 @@
        * @param $date
        * @return bool|PDOStatement
        */
-      public function upgradeAttendance($table, $attendance, $student_id, $date)
-      {
+     public function update_attendance($table,$attendance,$student_id,$date)
+     {
+         $sql = "UPDATE $table SET attendance = :attendance WHERE student_id ='$student_id' AND date ='$date'";
+         $this->stmt = $this->connection->prepare($sql);
+         $this->stmt->bindParam(':attendance',$attendance);
+            return  $this->stmt->execute();
 
-          $sql = 'UPDATE '.$table.' SET attendance = :attendance WHERE student_id ='.$student_id.' AND date = '.$date;
-          $this->stmt =$this->connection->prepare($sql);
-          $this->stmt->bindParam(':attendance',$attendance);
-          return $this->stmt;
+     }
 
-      }
+     public function searchDate($table)
+     {
+         $date = date('Y-m-d');
+        $query = "SELECT date FROM $table WHERE date = :date";
+        $this->stmt = $this->connection->prepare($query);
+        $this->stmt->bindParam(':date',$date);
+        return $this->stmt;
+
+
+     }
 
 
 

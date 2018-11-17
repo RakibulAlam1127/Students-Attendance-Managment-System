@@ -1,22 +1,39 @@
 <?php
-  //error_reporting('absent');
+  error_reporting('absent');
      #Include the Database file;
   include_once 'Database.php';
-  $result = $database->selectData('students_tbl','*',[]);
-  $result->execute();
-   if ($_SERVER['REQUEST_METHOD'] == 'POST'){
-       $attendance = $_POST['atten'];
-       $currentDate = date('Y-m-d');
+session_start();
+$atten = $database->fetchDate('attendance_tbl','date',[]);
+$atten->execute();
+$atten_date = $atten->fetchAll(PDO::FETCH_ASSOC);
 
-           foreach ($attendance as $key => $value) {
-               $database->insertData('attendance_tbl',[
-                   'date' => $currentDate,
-                   'attendance' => $value,
-                   'student_id' => $key
-               ]);
-           }
-       }
 
+
+
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+        $attendance = $_POST['atten'];
+        $currentDate = date('Y-m-d');
+        $search_date = $database->searchDate('attendance_tbl');
+        $search_date->execute();
+        if($search_date->rowCount() >=1){
+            $_SESSION['message'] = 'Attendance Was Already Taken';
+        }else{
+            foreach ($attendance as $key => $value) {
+                $database->insertData('attendance_tbl',[
+                    'date' => $currentDate,
+                    'attendance' => $value,
+                    'student_id' => $key
+                ]);
+            }
+        }
+}
+
+
+
+
+$result = $database->selectData('students_tbl','*',[]);
+ $result->execute();
 
 
 
@@ -43,14 +60,15 @@
                      </div>
                  </div>
                  <?php
-                    if (!empty($message)){
+                    if (!empty($_SESSION['message'])){
                         ?>
                         <div class="alert alert-warning">
                             <?php
-                             echo $message;
+                             echo $_SESSION['message'];
                             ?>
                         </div>
                  <?php
+                        unset($_SESSION['message']);
                     }
                  ?>
                  <div class="card-body">

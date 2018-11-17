@@ -4,7 +4,7 @@
     $student_id = $_GET['student_id'];
     $date = $_GET['date'];
  }else{
-     header('Location:viewDetailed.php');
+     header("Location:viewDetailed.php");
      exit();
  }
 
@@ -17,17 +17,18 @@ $datas =  $result->fetchAll(PDO::FETCH_ASSOC);
 
 if (isset($_POST['upgrade'])){
     $attendance = $_POST['atten'];
-    foreach ($attendance as $key => $value){
-        $upgrade_attendance = $database->upgradeAttendance('attendance_tbl',$value,$student_id,$date);
+    foreach ($attendance as $key => $atten){
+        $upgrade_attendance = $database->update_attendance('attendance_tbl',$atten,$student_id,$date);
     }
-
-
-   if($upgrade_attendance->execute()){
+ 
+   if ($upgrade_attendance){
        header('Location:viewAttendance.php');
        exit();
-   }else{
-       echo 'Fuck off';
    }
+
+
+
+
 }
 ?>
 <!doctype html>
